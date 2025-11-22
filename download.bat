@@ -2,9 +2,9 @@
 setlocal enabledelayedexpansion
 
 REM ============================
-REM  MAX PERFORMANCE DOWNLOAD
-REM  Auto-update yt-dlp
-REM  Use best video+audio
+REM  MAX PERFORMANCE DOWNLOAD LOOP
+REM  Prompt first → update → download
+REM  No pause between downloads
 REM ============================
 
 REM Location of tools
@@ -13,16 +13,23 @@ set OUT=downloads
 
 if not exist "%OUT%" mkdir "%OUT%"
 
-REM Auto-update yt-dlp (fast, silent)
+:START
+cls
+echo ============================
+echo   YT-DLP MAX DOWNLOAD
+echo ============================
+echo.
+
+set URL=
+set /p URL=Enter video/playlist URL (or X to exit): 
+
+if /I "%URL%"=="X" goto END
+if "%URL%"=="" goto START
+
+echo Checking for updates...
 "%YT%" -U >nul 2>&1
 
-REM Ask for URL if not passed
-if "%~1"=="" (
-    set /p URL=Enter video/playlist URL: 
-) else (
-    set URL=%~1
-)
-
+echo.
 echo Downloading...
 "%YT%" ^
  -f "bv*+ba/b" ^
@@ -35,5 +42,10 @@ echo Downloading...
  "%URL%"
 
 echo.
-echo Done!
-pause
+echo Download complete! Starting next...
+timeout /t 1 >nul
+
+goto START
+
+:END
+echo Exiting...
